@@ -1,0 +1,37 @@
+Abst(
+    Var('f'),
+    Abst(
+        Var('x'),
+        Appl(
+            Appl(
+                Var('f'),
+                Var('x')
+            ),
+            Abst(
+                Var('y'),
+                Abst(
+                    Var('z'),
+                    Appl(
+                        Appl(
+                            Var('f'),
+                            Appl(
+                                Var('x'),
+                                Var('y')
+                            )
+                        ),
+                        Var('z')
+                    )
+                )
+            )
+        )
+    )
+)
+
+Appl(
+    Appl(
+        Var('x')
+        ,
+        Var('y')
+    ),
+    Var('z')
+)
