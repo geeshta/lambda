@@ -1,28 +1,27 @@
-use crate::ast::freevars::FreeVars;
+use crate::ast::new::ASTMaker;
+use crate::ast::term::Term;
+use crate::ast::varset::VarSet;
 use std::fmt;
 use std::ops::Deref;
 
-pub trait Var {
-    fn var(c: char) -> Self;
-}
-
-#[derive(Hash, Eq, PartialEq, Clone, Debug)]
-pub enum Term {
-    Var(char),
-    Abstr(Box<AST>, Box<AST>),
-    Apply(Box<AST>, Box<AST>),
-}
-
-impl Var for Term {
-    fn var(c: char) -> Self {
-        Term::Var(c)
-    }
-}
-
 #[derive(Hash, Eq, PartialEq, Clone)]
 pub struct AST {
-    term: Term,
-    pub free_vars: FreeVars,
+    pub term: Term,
+    pub free_vars: VarSet,
+    pub binding_vars: VarSet,
+}
+
+impl AST {
+    pub fn all_vars(&self) -> VarSet {
+        self.free_vars.clone() | self.binding_vars.clone()
+    }
+    pub fn fresh(varset: VarSet) -> AST {
+        let mut candidates = ('a'..='z').chain('A'..='Z');
+        let new_char = candidates
+            .find(|&c| !varset.contains(&Term::Var(c)))
+            .expect("Ran out of variable names");
+        AST::var(new_char)
+    }
 }
 
 impl Deref for AST {
@@ -30,28 +29,6 @@ impl Deref for AST {
 
     fn deref(&self) -> &Self::Target {
         &self.term
-    }
-}
-
-impl AST {
-    pub fn abstr(param: AST, body: AST) -> Self {
-        let free_vars = body.free_vars.clone() - (*param).clone();
-        let term = Term::Abstr(Box::new(param), Box::new(body));
-        AST { term, free_vars }
-    }
-
-    pub fn apply(f: AST, arg: AST) -> Self {
-        let free_vars = f.free_vars.clone() | arg.free_vars.clone();
-        let term = Term::Apply(Box::new(f), Box::new(arg));
-        AST { term, free_vars }
-    }
-}
-
-impl Var for AST {
-    fn var(c: char) -> Self {
-        let term = Term::Var(c);
-        let free_vars = FreeVars::from(term.clone());
-        AST { term, free_vars }
     }
 }
 

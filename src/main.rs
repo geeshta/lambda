@@ -1,9 +1,9 @@
+// mod alpha;
 mod ast;
 mod lexer;
 mod parser;
-
-use ast::ast::{Term, Var};
-use ast::renaming::Renaming;
+// use alpha::renaming::Renaming;
+use ast::term::Term;
 use lexer::lexer::tokenize;
 use parser::parser::parse;
 
@@ -23,7 +23,7 @@ fn main() {
     match parse_result {
         Ok(ast) => {
             println!("AST: {:?}", ast);
-            println!("Renamed: {:?}", ast.rename(Term::var('f'), Term::var('a')));
+            // println!("Renamed: {:?}", ast.rename(Term::var('f'), Term::var('a')));
         }
         Err(e) => {
             println!("Parsing error: {:?}", e)

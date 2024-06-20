@@ -1,8 +1,10 @@
-use crate::ast::ast::{Term, Var, AST};
+use crate::ast::ast::AST;
+use crate::ast::new::ASTMaker;
+use crate::ast::term::Term;
 use crate::lexer::lexer::Token;
 
 #[derive(Debug)]
-pub enum Error {
+pub enum ParsingError {
     MismatchedParens(String),
     InvalidSyntax(String),
     InvalidLambda(String),
@@ -13,7 +15,7 @@ pub enum ParseResult<'a> {
     Continue(AST, &'a [Token]),
     Stop(AST, &'a [Token]),
     End(&'a [Token]),
-    Error(Error),
+    Error(ParsingError),
 }
 
 fn parse_body(tokens: &[Token]) -> ParseResult {
@@ -23,7 +25,7 @@ fn parse_body(tokens: &[Token]) -> ParseResult {
         [Token::Lambda, rest @ ..] => lambda(rest),
         [Token::RParen, rest @ ..] => ParseResult::End(rest),
         [] => ParseResult::End(&[]),
-        _ => ParseResult::Error(Error::InvalidSyntax(format!(
+        _ => ParseResult::Error(ParsingError::InvalidSyntax(format!(
             "Unexpected token in expression body: {:?}",
             tokens[0]
         ))),
@@ -35,7 +37,7 @@ fn parse_params(tokens: &[Token]) -> ParseResult {
         [Token::Var(c), rest @ ..] => ParseResult::Continue(AST::var(*c), rest),
         [Token::Arrow, rest @ ..] => ParseResult::End(rest),
         [] => ParseResult::End(&[]),
-        _ => ParseResult::Error(Error::InvalidSyntax(format!(
+        _ => ParseResult::Error(ParsingError::InvalidSyntax(format!(
             "Unexpected token in lambda params: {:?}",
             tokens[0]
         ))),
@@ -61,7 +63,7 @@ fn apply(term: AST, tokens: &[Token]) -> ParseResult {
 fn abstr(arg: AST, tokens: &[Token]) -> ParseResult {
     match parse_body(tokens) {
         ParseResult::Error(e) => ParseResult::Error(e),
-        ParseResult::End(_) => ParseResult::Error(Error::MismatchedParens(format!(
+        ParseResult::End(_) => ParseResult::Error(ParsingError::MismatchedParens(format!(
             "Unexpected ')' at the start of a lambda expression after {:?}",
             arg
         ))),
@@ -99,7 +101,7 @@ fn lambda(tokens: &[Token]) -> ParseResult {
                     ParseResult::Continue(AST::abstr(expr, new_expr), new_rest)
                 }
             },
-            _ => ParseResult::Error(Error::InvalidLambda(format!(
+            _ => ParseResult::Error(ParsingError::InvalidLambda(format!(
                 "Lambda expression arguments may only contain variables, found {:?}",
                 expr
             ))),
@@ -110,7 +112,7 @@ fn lambda(tokens: &[Token]) -> ParseResult {
 fn group(tokens: &[Token]) -> ParseResult {
     match parse_body(tokens) {
         ParseResult::Error(e) => ParseResult::Error(e),
-        ParseResult::End(_) => ParseResult::Error(Error::MismatchedParens(
+        ParseResult::End(_) => ParseResult::Error(ParsingError::MismatchedParens(
             "Empty parentheses '()' are not permitted".to_string(),
         )),
         ParseResult::Stop(expr, rest) => ParseResult::Continue(expr, rest),
@@ -127,10 +129,10 @@ fn group(tokens: &[Token]) -> ParseResult {
     }
 }
 
-pub fn parse(tokens: &[Token]) -> Result<AST, Error> {
+pub fn parse(tokens: &[Token]) -> Result<AST, ParsingError> {
     match parse_body(tokens) {
         ParseResult::Error(e) => Err(e),
-        ParseResult::End(_) => Err(Error::MismatchedParens(format!(
+        ParseResult::End(_) => Err(ParsingError::MismatchedParens(format!(
             "Unexpected ')' at the start of expression"
         ))),
         ParseResult::Stop(expr, _) => Ok(expr),

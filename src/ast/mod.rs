@@ -1,3 +1,4 @@
 pub mod ast;
-pub mod freevars;
-pub mod renaming;
+pub mod new;
+pub mod term;
+pub mod varset;
