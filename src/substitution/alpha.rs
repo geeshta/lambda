@@ -5,7 +5,6 @@ use crate::substitution::substitution::{Substitution, SubstitutionError};
 pub enum AlphaConvError {
     SubstitutionError(String),
     StructureError(String),
-    BindingError(String),
     VariablesError(String),
 }
 
@@ -20,22 +19,8 @@ pub trait AlhaConversion {
 
 impl AlhaConversion for AST {
     fn alpha_convert(&self, other: AST) -> Result<AST, AlphaConvError> {
-        if self.free_vars != other.free_vars {
-            return Err(AlphaConvError::VariablesError(format!(
-                "Different free variables: {:?} and {:?} in {:?} and {:?}",
-                &self.free_vars, other.free_vars, &self, other
-            )));
-        }
         match (&**self, other.term) {
             (Term::Abstr(param, body), Term::Abstr(other_param, other_body)) => {
-                if (&**body).binding_vars.contains(&***param)
-                    != (&*other_body).binding_vars.contains(&**other_param)
-                {
-                    return Err(AlphaConvError::BindingError(format!(
-                        "One of {:?} and {:?} is binding and other is not in {:?} {:?}",
-                        ***param, **other_param, **body, *other_body
-                    )));
-                }
                 let renamed_body =
                     (*other_body).substitute((*other_param).term, (**param).clone())?;
                 let converted_body = (&**body).alpha_convert(renamed_body)?;

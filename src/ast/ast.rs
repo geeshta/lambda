@@ -67,6 +67,10 @@ impl AST {
         self.free_vars.clone() | self.binding_vars.clone()
     }
 
+    pub fn bound_vars(&self) -> VarSet {
+        self.free_vars.clone() & self.binding_vars.clone()
+    }
+
     pub fn fresh(varset: VarSet) -> AST {
         let mut candidates = ('a'..='z').chain('A'..='Z');
         let new_char = candidates
@@ -91,9 +95,16 @@ impl Deref for AST {
 
 impl PartialEq for AST {
     fn eq(&self, other: &Self) -> bool {
-        match self.alpha_convert((*other).clone()) {
-            Ok(_) => true,
-            Err(_) => false,
+        match self.free_vars == other.free_vars {
+            false => false,
+            true => {
+                let right = &other.alpha_convert(self.clone());
+                let left = self.alpha_convert(other.clone());
+                match (left, right) {
+                    (Err(_), _) | (_, Err(_)) => false,
+                    _ => true,
+                }
+            }
         }
     }
 }
