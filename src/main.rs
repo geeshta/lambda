@@ -1,7 +1,7 @@
-mod alpha;
 mod ast;
 mod lexer;
 mod parser;
+mod substitution;
 use lexer::lexer::tokenize;
 use parser::parser::parse;
 
