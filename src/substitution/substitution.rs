@@ -19,7 +19,7 @@ impl Substitution for AST {
                 }
                 if !(self.bound_vars() & term.free_vars.clone()).is_empty() {
                     return Err(SubstitutionError::BindingConflict(format!(
-                        "Variable {:?} bound in {:?}",
+                        "Some of free variables of {:?} bound in {:?}",
                         term, self
                     )));
                 }
