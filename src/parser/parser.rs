@@ -1,5 +1,4 @@
 use crate::ast::ast::AST;
-use crate::ast::new::ASTMaker;
 use crate::ast::term::Term;
 use crate::lexer::lexer::Token;
 

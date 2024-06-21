@@ -1,9 +1,7 @@
-// mod alpha;
+mod alpha;
 mod ast;
 mod lexer;
 mod parser;
-// use alpha::renaming::Renaming;
-use ast::term::Term;
 use lexer::lexer::tokenize;
 use parser::parser::parse;
 
@@ -16,16 +14,18 @@ fn read_file(filename: &str) -> io::Result<String> {
 }
 
 fn main() {
-    let input = "$f -> ($x -> f(xx)) ($y -> f(yy))";
-    let tokens = tokenize(input).unwrap();
-    println!("Tokens: {:?}", tokens);
-    let parse_result = parse(&tokens);
-    match parse_result {
-        Ok(ast) => {
-            println!("AST: {:?}", ast);
-            // println!("Renamed: {:?}", ast.rename(Term::var('f'), Term::var('a')));
+    let (lhs, rhs) = ("$xy -> xzy", "$zy -> zzy");
+    let (ltokens, rtokens) = (tokenize(lhs).unwrap(), tokenize(rhs).unwrap());
+    println!("[LHS] Tokens: {:?}", ltokens);
+    println!("[RHS] Tokens: {:?}", rtokens);
+    let (lresult, rresult) = (parse(&ltokens), parse(&rtokens));
+    match (lresult, rresult) {
+        (Ok(last), Ok(rast)) => {
+            println!("[LHS] AST: {:?}", last);
+            println!("[RHS] AST: {:?}", rast);
+            println!("Equal: {:?}", last == rast);
         }
-        Err(e) => {
+        (Err(e), _) | (_, Err(e)) => {
             println!("Parsing error: {:?}", e)
         }
     }
