@@ -1,3 +1,4 @@
+use crate::ast::ast::AST;
 use crate::ast::term::Term;
 use std::collections::HashSet;
 use std::fmt;
@@ -32,6 +33,24 @@ impl FromIterator<Term> for VarSet {
     }
 }
 
+impl IntoIterator for VarSet {
+    type Item = Term;
+    type IntoIter = std::collections::hash_set::IntoIter<Term>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.inner.into_iter()
+    }
+}
+
+impl<'a> IntoIterator for &'a VarSet {
+    type Item = &'a Term;
+    type IntoIter = std::collections::hash_set::Iter<'a, Term>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.inner.iter()
+    }
+}
+
 impl VarSet {
     pub fn new() -> VarSet {
         let inner = HashSet::new();
@@ -43,6 +62,10 @@ impl VarSet {
 
     pub fn is_empty(&self) -> bool {
         self.inner.is_empty()
+    }
+
+    pub fn zip<'a>(&'a self, other: &'a VarSet) -> impl Iterator<Item = (&'a Term, &'a Term)> {
+        self.inner.iter().zip(other.inner.iter())
     }
 
     pub fn union(self, other: VarSet) -> VarSet {
@@ -91,6 +114,15 @@ impl VarSet {
 
     pub fn without(self, term: Term) -> VarSet {
         self.difference(VarSet::from(term))
+    }
+
+    pub fn fresh_set(&self) -> VarSet {
+        let mut unique_set = VarSet::new();
+        for _ in self.into_iter() {
+            let fresh_term = AST::fresh(self.clone() | unique_set.clone()).term;
+            unique_set = unique_set.with(fresh_term.clone());
+        }
+        unique_set
     }
 }
 

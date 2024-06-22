@@ -13,7 +13,7 @@ pub trait Substitution {
 impl Substitution for AST {
     fn substitute(self, var: Term, term: AST) -> Result<AST, SubstitutionError> {
         match &var {
-            Term::Var(c) => {
+            Term::Var(s) => {
                 if !self.free_vars.contains(&var) {
                     return Ok(self);
                 }
@@ -23,8 +23,8 @@ impl Substitution for AST {
                         term, self
                     )));
                 }
-                match self.term {
-                    Term::Var(f) => match *c == f {
+                match self.term.clone() {
+                    Term::Var(f) => match *s == f {
                         true => Ok(term),
                         false => Ok(self),
                     },
@@ -33,10 +33,13 @@ impl Substitution for AST {
                         let rhs = (*arg).substitute(var, term)?;
                         Ok(AST::apply(lhs, rhs))
                     }
-                    Term::Abstr(param, body) => match &term.free_vars.contains(&**param) {
+                    Term::Abstr(param, body) => match &term.free_vars.contains(&(*param).term) {
                         true => {
-                            let fresh_var =
-                                AST::fresh((&*body).all_vars() | (&*param).free_vars.clone());
+                            let fresh_var = AST::fresh(
+                                (&*body).all_vars()
+                                    | (&*param).free_vars.clone()
+                                    | term.free_vars.clone(),
+                            );
                             let renamed_body =
                                 (*body).substitute((*param).term, fresh_var.clone())?;
                             let new_body = renamed_body.substitute(var, term)?;

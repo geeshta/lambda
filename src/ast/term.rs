@@ -3,7 +3,7 @@ use std::hash::Hash;
 
 #[derive(Hash, Eq, PartialEq, Clone, Debug)]
 pub enum Term {
-    Var(char),
+    Var(String),
     Abstr(Box<AST>, Box<AST>),
     Apply(Box<AST>, Box<AST>),
 }

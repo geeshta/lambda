@@ -19,7 +19,7 @@ pub trait AlhaConversion {
 
 impl AlhaConversion for AST {
     fn alpha_convert(&self, other: AST) -> Result<AST, AlphaConvError> {
-        match (&**self, other.term) {
+        match (&(*self).term, other.term) {
             (Term::Abstr(param, body), Term::Abstr(other_param, other_body)) => {
                 let renamed_body =
                     (*other_body).substitute((*other_param).term, (**param).clone())?;
@@ -31,11 +31,11 @@ impl AlhaConversion for AST {
                 let rhs = (&**arg).alpha_convert(*other_arg)?;
                 Ok(AST::apply(lhs, rhs))
             }
-            (Term::Var(c), Term::Var(d)) => match *c == d {
-                true => Ok(AST::var(*c)),
+            (Term::Var(s), Term::Var(d)) => match *s == d {
+                true => Ok(AST::var(s.clone())),
                 false => Err(AlphaConvError::VariablesError(format!(
                     "Free variables {:?} and {:?} do not match",
-                    *c, d,
+                    *s, d,
                 ))),
             },
             (a, b) => Err(AlphaConvError::StructureError(format!(
