@@ -1,4 +1,4 @@
-use crate::ast::ast::AST;
+use crate::ast::AST;
 use std::collections::BTreeMap;
 use std::fmt;
 use std::ops::BitOr;

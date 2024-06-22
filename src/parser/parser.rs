@@ -1,6 +1,6 @@
-use crate::ast::ast::AST;
-use crate::ast::term::Term;
-use crate::lexer::lexer::Token;
+use crate::ast::Term;
+use crate::ast::AST;
+use crate::lexer::Token;
 
 #[derive(Debug)]
 pub enum ParsingError {

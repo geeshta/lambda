@@ -1,9 +1,9 @@
-use crate::alpha::conversion::AlhaConversion;
-use crate::ast::term::Term;
-use crate::lexer::lexer::tokenize;
-use crate::parser::parser::{parse, ParsingError};
-use crate::variables::generator::VarGen;
-use crate::variables::varset::VarSet;
+use crate::alpha::AlhaConversion;
+use crate::ast::Term;
+use crate::lexer::tokenize;
+use crate::parser::{parse, ParsingError};
+use crate::variables::VarGen;
+use crate::variables::VarSet;
 use regex::Error as RegexError;
 use std::cmp::Ordering;
 use std::fmt;

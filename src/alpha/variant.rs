@@ -1,6 +1,6 @@
-use crate::ast::ast::AST;
-use crate::ast::term::Term;
-use crate::variables::varmap::VarMap;
+use crate::ast::Term;
+use crate::ast::AST;
+use crate::variables::VarMap;
 
 pub trait AlphaVariant {
     fn remap(self, map: VarMap) -> AST;

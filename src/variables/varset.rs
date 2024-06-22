@@ -1,5 +1,5 @@
-use crate::ast::ast::AST;
-use crate::ast::term::Term;
+use crate::ast::Term;
+use crate::ast::AST;
 use std::collections::HashSet;
 use std::fmt;
 use std::hash::{Hash, Hasher};

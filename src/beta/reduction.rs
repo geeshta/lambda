@@ -1,8 +1,8 @@
-use crate::alpha::variant::AlphaVariant;
-use crate::ast::ast::AST;
-use crate::ast::term::Term;
-use crate::beta::memo::Memo;
-use crate::substitution::substitution::Substitution;
+use crate::alpha::AlphaVariant;
+use crate::ast::Term;
+use crate::ast::AST;
+use crate::beta::Memo;
+use crate::substitution::Substitution;
 pub trait BetaReduction {
     fn beta_step(self, memo: Memo) -> (AST, Memo);
     fn beta_reduction(self, memo: Option<Memo>) -> (AST, Memo);

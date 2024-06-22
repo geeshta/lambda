@@ -1,6 +1,6 @@
-use crate::ast::ast::AST;
-use crate::ast::term::Term;
-use crate::substitution::substitution::{Substitution, SubstitutionError};
+use crate::ast::Term;
+use crate::ast::AST;
+use crate::substitution::{Substitution, SubstitutionError};
 #[derive(Debug, Clone)]
 pub enum AlphaConvError {
     SubstitutionError(String),

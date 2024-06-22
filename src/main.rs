@@ -5,11 +5,8 @@ mod lexer;
 mod parser;
 mod substitution;
 mod variables;
-use alpha::variant::AlphaVariant;
 use ast::ast::AST;
-use beta::memo::Memo;
-use beta::reduction::BetaReduction;
-use substitution::substitution::Substitution;
+use beta::BetaReduction;
 
 use std::fs;
 use std::io;
