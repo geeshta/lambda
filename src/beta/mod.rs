@@ -1,3 +1,4 @@
+//! This module handles the beta reduction of terms
 pub mod memo;
 pub mod reduction;
 

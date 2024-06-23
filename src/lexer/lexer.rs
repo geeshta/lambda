@@ -1,5 +1,6 @@
 use regex::Regex;
 
+/// Type that represents valid tokens
 #[derive(Debug)]
 pub enum Token {
     Var(String),
@@ -10,6 +11,7 @@ pub enum Token {
     Comma,
 }
 
+/// Function that converts input string into a sequence of tokens
 pub fn tokenize(input: &str) -> Result<Vec<Token>, regex::Error> {
     let re = Regex::new(r"\$|->|[a-zA-Z_][a-zA-Z_0-9]*|[(),]")?;
     Ok(re

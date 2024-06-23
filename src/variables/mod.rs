@@ -1,3 +1,4 @@
+//! Module responsible for dealing with free and fresh variables
 pub mod generator;
 pub mod varmap;
 pub mod varset;

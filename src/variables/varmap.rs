@@ -5,6 +5,8 @@ use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::iter::FromIterator;
 
+/// Type represents a bidirectional mapping of variable names
+/// Used for renaming in order to create an alpha variant of an expression
 #[derive(Eq, PartialEq, Clone)]
 pub struct VarMap {
     inner: HashMap<Term, Term>,
@@ -19,6 +21,8 @@ impl Hash for VarMap {
 }
 
 impl From<(Term, Term)> for VarMap {
+    /// Create a new map from a single variable pair
+    /// Insert both commutative pairs
     fn from(entry: (Term, Term)) -> Self {
         let inner = match entry {
             (term1, term2) => HashMap::from([(term1.clone(), term2.clone()), (term2, term1)]),
@@ -28,6 +32,8 @@ impl From<(Term, Term)> for VarMap {
 }
 
 impl FromIterator<(Term, Term)> for VarMap {
+    /// Create a new map form an iterable of variable pairs
+    /// Insert both commutative pairs for each one
     fn from_iter<T: IntoIterator<Item = (Term, Term)>>(iter: T) -> Self {
         let inner = iter
             .into_iter()
@@ -38,11 +44,13 @@ impl FromIterator<(Term, Term)> for VarMap {
 }
 
 impl VarMap {
+    /// Create a new map from two sets, zipping them together and adding both pairs
     pub fn from_sets(first: VarSet, second: VarSet) -> VarMap {
         let iter = first.zip(&second).map(|(t1, t2)| (t1.clone(), t2.clone()));
         let result = VarMap::from_iter(iter);
         result
     }
+    /// If a variable is mapped, return its mapping. Otherwise, return it back
     pub fn get(&self, term: Term) -> Term {
         self.inner.get(&term).cloned().unwrap_or(term)
     }

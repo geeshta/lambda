@@ -6,6 +6,8 @@ use std::hash::{Hash, Hasher};
 use std::iter::FromIterator;
 use std::ops::{Add, BitAnd, BitOr, BitXor, Div, Sub};
 
+/// Type represents a set of variables
+/// Used to keep track of free and bound variables
 #[derive(Eq, PartialEq, Clone)]
 pub struct VarSet {
     inner: HashSet<Term>,
@@ -20,6 +22,7 @@ impl Hash for VarSet {
 }
 
 impl From<Term> for VarSet {
+    /// Create a new set form a variable
     fn from(term: Term) -> Self {
         let inner = HashSet::from([term]);
         VarSet { inner }
@@ -27,6 +30,7 @@ impl From<Term> for VarSet {
 }
 
 impl FromIterator<Term> for VarSet {
+    /// Create a new set from an iterable of variables
     fn from_iter<T: IntoIterator<Item = Term>>(iter: T) -> Self {
         let inner = HashSet::from_iter(iter);
         VarSet { inner }
@@ -52,14 +56,17 @@ impl<'a> IntoIterator for &'a VarSet {
 }
 
 impl VarSet {
+    /// Create an empty set
     pub fn new() -> VarSet {
         let inner = HashSet::new();
         VarSet { inner }
     }
+    /// Check whether a variable is in the set
     pub fn contains(&self, term: &Term) -> bool {
         self.inner.contains(&term)
     }
 
+    /// Check whether it is an empty set
     pub fn is_empty(&self) -> bool {
         self.inner.is_empty()
     }
@@ -68,6 +75,7 @@ impl VarSet {
         self.inner.iter().zip(other.inner.iter())
     }
 
+    /// Return the union of two sets
     pub fn union(self, other: VarSet) -> VarSet {
         let inner = other
             .inner
@@ -77,6 +85,7 @@ impl VarSet {
         VarSet { inner }
     }
 
+    /// Return the intersection of two sets
     pub fn intersection(self, other: VarSet) -> VarSet {
         let inner = self
             .inner
@@ -86,6 +95,7 @@ impl VarSet {
         VarSet { inner }
     }
 
+    /// Return the difference of two sets
     pub fn difference(self, other: VarSet) -> VarSet {
         let inner = self
             .inner
@@ -95,6 +105,7 @@ impl VarSet {
         VarSet { inner }
     }
 
+    /// Return the symmetric difference of two sets
     pub fn symmetric_difference(self, other: VarSet) -> VarSet {
         let self_inner = self.inner.clone();
         let other_inner = other.inner.clone();
@@ -108,14 +119,17 @@ impl VarSet {
         VarSet { inner }
     }
 
+    /// Return a new set extended with the given variable
     pub fn with(self, term: Term) -> VarSet {
         self.union(VarSet::from(term))
     }
 
+    /// Return a new set with the variable removed
     pub fn without(self, term: Term) -> VarSet {
         self.difference(VarSet::from(term))
     }
 
+    /// Generate a set of the same length with all varaibles unique
     pub fn fresh_set(&self) -> VarSet {
         let mut unique_set = VarSet::new();
         for _ in self.into_iter() {
@@ -129,6 +143,7 @@ impl VarSet {
 impl BitOr for VarSet {
     type Output = Self;
 
+    /// Map the union operation to |
     fn bitor(self, other: Self) -> Self::Output {
         self.union(other)
     }
@@ -137,6 +152,7 @@ impl BitOr for VarSet {
 impl BitAnd for VarSet {
     type Output = Self;
 
+    /// Map the intersection operation to &
     fn bitand(self, other: Self) -> Self::Output {
         self.intersection(other)
     }
@@ -145,6 +161,7 @@ impl BitAnd for VarSet {
 impl Div for VarSet {
     type Output = Self;
 
+    /// Map the difference operion to /
     fn div(self, other: Self) -> Self::Output {
         self.difference(other)
     }
@@ -153,6 +170,7 @@ impl Div for VarSet {
 impl BitXor for VarSet {
     type Output = Self;
 
+    /// Map the symmetric difference operion to ^
     fn bitxor(self, other: Self) -> Self::Output {
         self.symmetric_difference(other)
     }
@@ -161,6 +179,7 @@ impl BitXor for VarSet {
 impl Add<Term> for VarSet {
     type Output = Self;
 
+    /// Map the "with" operation to +
     fn add(self, term: Term) -> Self::Output {
         self.with(term)
     }
@@ -169,6 +188,7 @@ impl Add<Term> for VarSet {
 impl Sub<Term> for VarSet {
     type Output = Self;
 
+    /// Map the "without" operation to -
     fn sub(self, term: Term) -> Self::Output {
         self.without(term)
     }

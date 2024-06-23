@@ -22,7 +22,7 @@ fn process_exprs(exprs: &[&str]) {
         match AST::eval(&expr) {
             Ok(ast) => {
                 println!("AST: {:?}", ast);
-                let reduced = ast.beta_reduce();
+                let reduced = ast.reduce();
                 println!("Reduced: {:?}", reduced);
                 println!("{}", reduced.is_reducible);
             }
