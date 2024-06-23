@@ -8,33 +8,17 @@ pub enum SubstitutionError {
 }
 pub trait Substitution {
     fn substitute(self, var: Term, term: AST) -> Result<AST, SubstitutionError>;
-    fn check_substitution<F>(
-        &self,
-        var: &Term,
-        term: &AST,
-        substitute_fn: F,
-    ) -> Result<AST, SubstitutionError>
-    where
-        F: FnOnce(AST, Term, AST) -> Result<AST, SubstitutionError>;
 }
 
-impl Substitution for AST {
-    /// Helper function that handles all the validation and takes in the main substitution as an argument
-    fn check_substitution<F>(
-        &self,
-        var: &Term,
-        term: &AST,
-        substitute_fn: F,
-    ) -> Result<AST, SubstitutionError>
-    where
-        F: FnOnce(AST, Term, AST) -> Result<AST, SubstitutionError>,
-    {
+impl AST {
+    /// Helper function for substitution checks
+    fn check_substitution(&self, var: &Term, term: &AST) -> Result<(), SubstitutionError> {
         match var {
             // Var has to actually be a variable
             Term::Var(_) => {
-                // If there's nothing to substitute, return
+                // If there's nothing to substitute, return Ok(())
                 if !self.free_vars.contains(var) {
-                    return Ok(self.clone());
+                    return Ok(());
                 }
                 // A free variable in term would become bound if it is binding in self
                 if !(self.bound_vars() & term.free_vars.clone()).is_empty() {
@@ -43,8 +27,7 @@ impl Substitution for AST {
                         term, self
                     )));
                 }
-                // Call the main substitution function
-                substitute_fn(self.clone(), var.clone(), term.clone())
+                Ok(())
             }
             _ => Err(SubstitutionError::NotAVariable(format!(
                 "Can only substitute variables, not {:?}",
@@ -52,13 +35,17 @@ impl Substitution for AST {
             ))),
         }
     }
+}
 
+impl Substitution for AST {
     fn substitute(self, var: Term, term: AST) -> Result<AST, SubstitutionError> {
-        self.check_substitution(&var, &term, |ast, var, term| match ast.term.clone() {
+        self.check_substitution(&var, &term)?;
+
+        match self.term.clone() {
             // Variable - substitute if it is equal to var
             Term::Var(f) => match var {
                 Term::Var(ref s) if s == &f => Ok(term),
-                _ => Ok(ast),
+                _ => Ok(self),
             },
             // Application - recursively substitute left and right sides
             Term::Apply(f, arg) => {
@@ -87,6 +74,6 @@ impl Substitution for AST {
                     Ok(AST::abstr(*param, new_body))
                 }
             },
-        })
+        }
     }
 }

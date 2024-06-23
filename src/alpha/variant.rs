@@ -3,11 +3,10 @@ use crate::ast::AST;
 use crate::variables::VarMap;
 
 pub trait AlphaVariant {
-    fn remap(self, map: VarMap) -> AST;
     fn alpha_variant(&self) -> AST;
 }
 
-impl AlphaVariant for AST {
+impl AST {
     // Remap all varaibles in a term for different ones
     fn remap(self, var_map: VarMap) -> AST {
         match self.term {
@@ -24,6 +23,9 @@ impl AlphaVariant for AST {
             Term::Apply(f, arg) => AST::apply(f.remap(var_map.clone()), arg.remap(var_map)),
         }
     }
+}
+
+impl AlphaVariant for AST {
     // Create an alpha variant of a term
     fn alpha_variant(&self) -> AST {
         let new_ast = self.clone();

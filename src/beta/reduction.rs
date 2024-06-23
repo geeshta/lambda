@@ -4,13 +4,10 @@ use crate::ast::AST;
 use crate::beta::Memo;
 use crate::substitution::Substitution;
 pub trait BetaReduction {
-    fn beta_step(self, memo: Memo) -> (AST, Memo);
-    fn beta_reduce(self, memo: Option<Memo>) -> (AST, Memo);
     fn reduce(self) -> AST;
-    fn reduce_redex(self, memo: Memo, param: AST, body: AST, arg: AST) -> (AST, Memo);
 }
 
-impl BetaReduction for AST {
+impl AST {
     /// One step of a beta reduction. It is recursive so it may actually perform multiple substitutions
     fn beta_step(self, memo: Memo) -> (AST, Memo) {
         match self.is_reducible {
@@ -67,7 +64,9 @@ impl BetaReduction for AST {
                 .beta_reduce(Some(new_memo.with(self, new_ast))),
         }
     }
+}
 
+impl BetaReduction for AST {
     /// A beta reduction loop that keeps the memo hidden
     fn reduce(self) -> AST {
         let (result, memo) = self.beta_reduce(None);
