@@ -5,27 +5,27 @@ use std::ops::BitOr;
 
 /// Type represents the mapping of all previsously evaluated terms
 #[derive(Clone)]
-pub struct Memo {
+pub struct TermMap {
     inner: BTreeMap<AST, AST>,
 }
 
-impl From<(AST, AST)> for Memo {
+impl From<(AST, AST)> for TermMap {
     fn from(entry: (AST, AST)) -> Self {
         let inner = match entry {
             (key, value) => BTreeMap::from([(key, value)]),
         };
-        Memo { inner }
+        TermMap { inner }
     }
 }
 
-impl FromIterator<(AST, AST)> for Memo {
+impl FromIterator<(AST, AST)> for TermMap {
     fn from_iter<T: IntoIterator<Item = (AST, AST)>>(iter: T) -> Self {
         let inner = iter.into_iter().collect();
-        Memo { inner }
+        TermMap { inner }
     }
 }
 
-impl IntoIterator for Memo {
+impl IntoIterator for TermMap {
     type Item = (AST, AST);
     type IntoIter = std::collections::btree_map::IntoIter<AST, AST>;
 
@@ -34,7 +34,7 @@ impl IntoIterator for Memo {
     }
 }
 
-impl<'a> IntoIterator for &'a Memo {
+impl<'a> IntoIterator for &'a TermMap {
     type Item = (&'a AST, &'a AST);
     type IntoIter = std::collections::btree_map::Iter<'a, AST, AST>;
 
@@ -43,9 +43,9 @@ impl<'a> IntoIterator for &'a Memo {
     }
 }
 
-impl Memo {
+impl TermMap {
     pub fn new() -> Self {
-        Memo {
+        TermMap {
             inner: BTreeMap::new(),
         }
     }
@@ -58,14 +58,14 @@ impl Memo {
     pub fn with(self, key: AST, value: AST) -> Self {
         let mut inner = self.inner;
         inner.insert(key, value);
-        Memo { inner }
+        TermMap { inner }
     }
 
     /// Extend with other memo and return a new copy
-    pub fn extended_with(self, other: Memo) -> Self {
+    pub fn extended_with(self, other: TermMap) -> Self {
         let mut inner = self.inner;
         inner.extend(other);
-        Memo { inner }
+        TermMap { inner }
     }
 
     /// If a term was previously evaluated, return it. Otherwise return back the parameter
@@ -80,7 +80,7 @@ impl Memo {
     }
 }
 
-impl BitOr for Memo {
+impl BitOr for TermMap {
     type Output = Self;
 
     fn bitor(self, other: Self) -> Self::Output {
@@ -88,7 +88,7 @@ impl BitOr for Memo {
     }
 }
 
-impl fmt::Debug for Memo {
+impl fmt::Debug for TermMap {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:?}", self.inner.keys())
     }
