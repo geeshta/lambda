@@ -132,9 +132,9 @@ impl PartialOrd for AST {
 impl fmt::Debug for AST {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &(*self).term {
-            Term::Var(s) => write!(f, "{:?}", s),
-            Term::Abstr(param, body) => write!(f, "(${:?} -> {:?})", param, body),
-            Term::Apply(func, arg) => write!(f, "{:?} {:?}", func, arg),
+            Term::Var(s) => write!(f, "Var({:?})", s),
+            Term::Abstr(param, body) => write!(f, "Abstr({:?} -> {:?})", param, body),
+            Term::Apply(func, arg) => write!(f, "Appl({:?}, {:?})", func, arg),
         }
     }
 }
